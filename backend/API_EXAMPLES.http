@@ -1,0 +1,98 @@
+@baseUrl = http://localhost:5000/api
+@token = paste-jwt-token-here
+@projectId = paste-project-id-here
+@taskId = paste-task-id-here
+@memberId = paste-member-id-here
+
+### Signup - first user becomes Admin
+POST {{baseUrl}}/auth/signup
+Content-Type: application/json
+
+{
+  "name": "Avery Stone",
+  "email": "avery@example.com",
+  "password": "Password123"
+}
+
+### Generic Login
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "avery@example.com",
+  "password": "Password123"
+}
+
+### Admin Login
+POST {{baseUrl}}/auth/admin-login
+Content-Type: application/json
+
+{
+  "email": "avery@example.com",
+  "password": "Password123"
+}
+
+### Member Login
+POST {{baseUrl}}/auth/member-login
+Content-Type: application/json
+
+{
+  "email": "member@example.com",
+  "password": "Password123"
+}
+
+### Current user
+GET {{baseUrl}}/auth/me
+Authorization: Bearer {{token}}
+
+### List users
+GET {{baseUrl}}/users
+Authorization: Bearer {{token}}
+
+### Create project
+POST {{baseUrl}}/projects
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "title": "Launch Control Room",
+  "description": "Coordinate final content, QA, analytics, and customer success handoffs for launch.",
+  "deadline": "2026-07-01T10:00:00.000Z",
+  "members": ["{{memberId}}"]
+}
+
+### List projects
+GET {{baseUrl}}/projects?search=launch
+Authorization: Bearer {{token}}
+
+### Create task
+POST {{baseUrl}}/tasks
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "title": "Prepare release checklist",
+  "description": "Create the final checklist with owners, acceptance criteria, and rollback notes.",
+  "status": "Todo",
+  "priority": "High",
+  "assignedTo": "{{memberId}}",
+  "project": "{{projectId}}",
+  "deadline": "2026-06-20T10:00:00.000Z"
+}
+
+### Search/filter tasks
+GET {{baseUrl}}/tasks?status=Todo&priority=High&sort=deadline
+Authorization: Bearer {{token}}
+
+### Update status
+PATCH {{baseUrl}}/tasks/{{taskId}}/status
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "status": "In Progress"
+}
+
+### Dashboard analytics
+GET {{baseUrl}}/analytics/dashboard
+Authorization: Bearer {{token}}
