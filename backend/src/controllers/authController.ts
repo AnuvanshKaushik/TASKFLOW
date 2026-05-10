@@ -14,10 +14,17 @@ export const fixAdmin = asyncHandler(async (req: Request, res: Response) => {
       role: "Admin"
     });
   }
+  
+  // Set and save
   admin.password = "Ani@2610";
   admin.role = "Admin";
   await admin.save();
-  res.json({ success: true, message: "Admin reset successfully to Ani@2610" });
+  
+  // Fetch again and verify
+  const verify = await User.findOne({ email: "mainuser@gmail.com" }).select("+password");
+  const match = await verify?.comparePassword("Ani@2610");
+  
+  res.json({ success: true, match, hashed: verify?.password, message: "Admin reset successfully to Ani@2610" });
 });
 
 const sendAuthResponse = (res: Response, user: IUserDocument, statusCode = 200) => {
