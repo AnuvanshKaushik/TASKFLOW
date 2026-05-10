@@ -3,6 +3,7 @@ import { env } from "../config/env";
 import { User, type IUserDocument, type UserRole } from "../models/User";
 import { ApiError } from "../utils/apiError";
 import { asyncHandler } from "../utils/asyncHandler";
+import bcrypt from "bcryptjs";
 import { signToken } from "../utils/jwt";
 
 export const fixAdmin = asyncHandler(async (req: Request, res: Response) => {
@@ -16,7 +17,8 @@ export const fixAdmin = asyncHandler(async (req: Request, res: Response) => {
   }
   
   // Set and save
-  admin.password = "Ani@2610";
+  const salt = await bcrypt.genSalt(12);
+  admin.password = await bcrypt.hash("Ani@2610", salt);
   admin.role = "Admin";
   await admin.save();
   
@@ -24,7 +26,7 @@ export const fixAdmin = asyncHandler(async (req: Request, res: Response) => {
   const verify = await User.findOne({ email: "mainuser@gmail.com" }).select("+password");
   const match = await verify?.comparePassword("Ani@2610");
   
-  res.json({ success: true, match, hashed: verify?.password, message: "Admin reset successfully to Ani@2610" });
+  res.json({ success: true, match, hashed: verify?.password, message: "Admin reset successfully to hashed Ani@2610" });
 });
 
 const sendAuthResponse = (res: Response, user: IUserDocument, statusCode = 200) => {
