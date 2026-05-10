@@ -3,9 +3,12 @@ dist
 build
 .env
 .env.local
+.env.production.local
 .DS_Store
 *.log
 .vercel
 .railway
 coverage
-
+*.tsbuildinfo
+vite.config.js
+vite.config.d.ts
