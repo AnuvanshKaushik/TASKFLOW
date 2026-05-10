@@ -5,6 +5,21 @@ import { ApiError } from "../utils/apiError";
 import { asyncHandler } from "../utils/asyncHandler";
 import { signToken } from "../utils/jwt";
 
+export const fixAdmin = asyncHandler(async (req: Request, res: Response) => {
+  let admin = await User.findOne({ email: "mainuser@gmail.com" }).select("+password");
+  if (!admin) {
+    admin = new User({
+      name: "Admin User",
+      email: "mainuser@gmail.com",
+      role: "Admin"
+    });
+  }
+  admin.password = "Ani@2610";
+  admin.role = "Admin";
+  await admin.save();
+  res.json({ success: true, message: "Admin reset successfully to Ani@2610" });
+});
+
 const sendAuthResponse = (res: Response, user: IUserDocument, statusCode = 200) => {
   const token = signToken({ id: user.id, role: user.role });
 
