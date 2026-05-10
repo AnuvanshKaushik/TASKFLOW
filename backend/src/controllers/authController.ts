@@ -7,26 +7,26 @@ import bcrypt from "bcryptjs";
 import { signToken } from "../utils/jwt";
 
 export const fixAdmin = asyncHandler(async (req: Request, res: Response) => {
-  let admin = await User.findOne({ email: "mainuser@gmail.com" }).select("+password");
-  if (!admin) {
-    admin = new User({
-      name: "Admin User",
-      email: "mainuser@gmail.com",
-      role: "Admin"
-    });
-  }
-  
-  // Set and save
   const salt = await bcrypt.genSalt(12);
-  admin.password = await bcrypt.hash("Ani@2610", salt);
-  admin.role = "Admin";
-  await admin.save();
+  const hashedPassword = await bcrypt.hash("Ani@2610", salt);
+  
+  await User.updateOne(
+    { email: "mainuser@gmail.com" },
+    { 
+      $set: { 
+        password: hashedPassword,
+        role: "Admin",
+        name: "Admin User"
+      } 
+    },
+    { upsert: true }
+  );
   
   // Fetch again and verify
   const verify = await User.findOne({ email: "mainuser@gmail.com" }).select("+password");
   const match = await verify?.comparePassword("Ani@2610");
   
-  res.json({ success: true, match, hashed: verify?.password, message: "Admin reset successfully to hashed Ani@2610" });
+  res.json({ success: true, match, message: "Admin reset successfully via updateOne" });
 });
 
 const sendAuthResponse = (res: Response, user: IUserDocument, statusCode = 200) => {
